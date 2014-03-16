@@ -188,6 +188,16 @@ DX_INLINE void dxMat3::Identity()
     mat[2*3+2] = 1.0f;
 }
 
+DX_INLINE dxMat3::operator float * ()
+{
+	return mat;
+}
+
+DX_INLINE dxMat3::operator const float * () const
+{
+	return mat;
+}
+
 DX_INLINE float & dxMat3::operator [] (int i)
 {
     return mat[i];
@@ -216,6 +226,76 @@ DX_INLINE dxMat3 & dxMat3::operator * (const dxMat3 &other)
     temp[0*3+2] = mat[0*3+2] * other[0*3+0] + mat[1*3+2] * other[0*3+1] + mat[2*3+2] * other[0*3+2];
     temp[1*3+2] = mat[0*3+2] * other[1*3+0] + mat[1*3+2] * other[1*3+1] + mat[2*3+2] * other[1*3+2];
     temp[2*3+2] = mat[0*3+2] * other[2*3+0] + mat[1*3+2] * other[2*3+1] + mat[2*3+2] * other[2*3+2];
+
+	memcpy(mat, temp, sizeof(mat));
+
+    return *this;
+}
+
+/*
+========================================
+  dxMat4
+========================================
+*/
+DX_INLINE void dxMat4::Identity()
+{
+    memset(mat, 0, sizeof(mat));
+
+    mat[0*4+0] = 1.0f;
+    mat[1*4+1] = 1.0f;
+    mat[2*4+2] = 1.0f;
+	mat[3*4+3] = 1.0f;
+}
+
+DX_INLINE dxMat4::operator float * ()
+{
+	return mat;
+}
+
+DX_INLINE dxMat4::operator const float * () const
+{
+	return mat;
+}
+
+DX_INLINE float & dxMat4::operator [] (int i)
+{
+    return mat[i];
+}
+
+DX_INLINE const float & dxMat4::operator [] (int i) const
+{
+    return mat[i];
+}
+
+DX_INLINE dxMat4 & dxMat4::operator * (const dxMat4 &other)
+{
+	float temp[16];
+
+	//row 1
+	temp[0*4+0] = mat[0*4+0] * other[0*4+0] + mat[1*4+0] * other[0*4+1] + mat[2*4+0] * other[0*4+2] + mat[3*4+0] * other[0*4+3];
+	temp[1*4+0] = mat[0*4+0] * other[1*4+0] + mat[1*4+0] * other[1*4+1] + mat[2*4+0] * other[1*4+2] + mat[3*4+0] * other[1*4+3];
+	temp[2*4+0] = mat[0*4+0] * other[2*4+0] + mat[1*4+0] * other[2*4+1] + mat[2*4+0] * other[2*4+2] + mat[3*4+0] * other[2*4+3];
+	temp[3*4+0] = mat[0*4+0] * other[3*4+0] + mat[1*4+0] * other[3*4+1] + mat[2*4+0] * other[3*4+2] + mat[3*4+0] * other[3*4+3];
+
+	//row 2
+	temp[0*4+1] = mat[0*4+1] * other[0*4+0] + mat[1*4+1] * other[0*4+1] + mat[2*4+1] * other[0*4+2] + mat[3*4+1] * other[0*4+3];
+	temp[1*4+1] = mat[0*4+1] * other[1*4+0] + mat[1*4+1] * other[1*4+1] + mat[2*4+1] * other[1*4+2] + mat[3*4+1] * other[1*4+3];
+	temp[2*4+1] = mat[0*4+1] * other[2*4+0] + mat[1*4+1] * other[2*4+1] + mat[2*4+1] * other[2*4+2] + mat[3*4+1] * other[2*4+3];
+	temp[3*4+1] = mat[0*4+1] * other[3*4+0] + mat[1*4+1] * other[3*4+1] + mat[2*4+1] * other[3*4+2] + mat[3*4+1] * other[3*4+3];
+
+	//row 3
+	temp[0*4+2] = mat[0*4+2] * other[0*4+0] + mat[1*4+2] * other[0*4+1] + mat[2*4+2] * other[0*4+2] + mat[3*4+2] * other[0*4+3];
+	temp[1*4+2] = mat[0*4+2] * other[1*4+0] + mat[1*4+2] * other[1*4+1] + mat[2*4+2] * other[1*4+2] + mat[3*4+2] * other[1*4+3];
+	temp[2*4+2] = mat[0*4+2] * other[2*4+0] + mat[1*4+2] * other[2*4+1] + mat[2*4+2] * other[2*4+2] + mat[3*4+2] * other[2*4+3];
+	temp[3*4+2] = mat[0*4+2] * other[3*4+0] + mat[1*4+2] * other[3*4+1] + mat[2*4+2] * other[3*4+2] + mat[3*4+2] * other[3*4+3];
+
+	//row 4
+	temp[0*4+3] = mat[0*4+3] * other[0*4+0] + mat[1*4+3] * other[0*4+1] + mat[2*4+3] * other[0*4+2] + mat[3*4+3] * other[0*4+3];
+	temp[1*4+3] = mat[0*4+3] * other[1*4+0] + mat[1*4+3] * other[1*4+1] + mat[2*4+3] * other[1*4+2] + mat[3*4+3] * other[1*4+3];
+	temp[2*4+3] = mat[0*4+3] * other[2*4+0] + mat[1*4+3] * other[2*4+1] + mat[2*4+3] * other[2*4+2] + mat[3*4+3] * other[2*4+3];
+	temp[3*4+3] = mat[0*4+3] * other[3*4+0] + mat[1*4+3] * other[3*4+1] + mat[2*4+3] * other[3*4+2] + mat[3*4+3] * other[3*4+3];
+
+	memcpy(mat, temp, sizeof(mat));
 
     return *this;
 }

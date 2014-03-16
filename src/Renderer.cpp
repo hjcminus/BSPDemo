@@ -575,6 +575,14 @@ void dxRenderer::SetupFrame(const dxVec3 &vieworigin_, const dxVec3 &viewforward
     float fovy = (float)DX_FOVY;
     float fovx = (float)DX_FOVY * (float)viewratio;
 
+	dxMat4 matProj;
+	dxMat4 matModelView;
+
+	dxglGetFloatv(GL_PROJECTION_MATRIX, matProj);
+	dxglGetFloatv(GL_MODELVIEW_MATRIX,  matModelView);
+
+	matMVP = matProj * matModelView;
+
     //left
     Mat3Rotation(-(90.0f - fovx * 0.5f), viewup_, m);
     Vec3Transform(viewforward_, m, frustum[0].normal);
@@ -616,6 +624,7 @@ void dxRenderer::BeginDrawSky()
 
     dxglUseProgram(program_sky.prgnum);
 
+	dxglUniformMatrix4fv(uniform_skyMatMVP, 1, GL_FALSE, matMVP);
     dxglUniform1i(uniform_skytex,  0);
     dxglUniform3f(uniform_skyviewpos, vieworigin[0], vieworigin[1], vieworigin[2]);
 
@@ -650,6 +659,7 @@ void dxRenderer::BeginDrawOpaque(GLuint vertbuf_model, GLuint texcoord1_model, G
         dxglEnable(GL_ALPHA_TEST);
     }
 
+	dxglUniformMatrix4fv(uniform_opaqueMatMVP, 1, GL_FALSE, matMVP);
     dxglUniform1i(uniform_surftex_opaque,  0);
     dxglUniform1i(uniform_lightmap_opaque, 1);
 
@@ -688,6 +698,7 @@ void dxRenderer::BeginDrawAlpha(GLuint vertbuf_model, GLuint texcoord_model)
 
     dxglUseProgram(program_alpha.prgnum);
 
+	dxglUniformMatrix4fv(uniform_alphaMatMVP, 1, GL_FALSE, matMVP);
 	dxglUniform1i(uniform_surftex_alpha, 0);
 
     dxglEnableVertexAttribArray(0);
@@ -775,15 +786,16 @@ void dxRenderer::LoadPrograms()
         "#version 140                                                  \n"
 
         "uniform vec3 viewPos;                                         \n"
+		"uniform mat4 matMVP;                                          \n"
 
-        "in  vec3 vertPos;                                             \n"
+        "in  vec4 vertPos;                                             \n"
         "in  vec2 texCoordIn;                                          \n"
         "out vec2 texCoord;                                            \n"
 
         "void main()                                                   \n"
         "{                                                             \n"
-        "  vec4 pos    = gl_Vertex + vec4(viewPos, 0.0f); "
-        "  gl_Position = gl_ModelViewProjectionMatrix * pos;           \n"
+        "  vec4 pos    = vertPos + vec4(viewPos, 0.0f);                \n"
+        "  gl_Position = matMVP * pos;                                 \n"
         "  texCoord    = texCoordIn;                                   \n"
         "}"
     };
@@ -807,6 +819,8 @@ void dxRenderer::LoadPrograms()
 	{
 		"#version 140                                                  \n"
 
+		"uniform mat4 matMVP;                                          \n"
+
 		"in  vec4 vertPos;                                             \n"
 		"in  vec2 texCoordIn1;                                         \n"
 		"in  vec2 texCoordIn2;                                         \n"
@@ -815,7 +829,7 @@ void dxRenderer::LoadPrograms()
 
 		"void main()                                                   \n"
 		"{                                                             \n"
-		"    gl_Position = gl_ModelViewProjectionMatrix * vertPos;     \n"
+		"    gl_Position = matMVP * vertPos;                           \n"
 		"    texCoord1   = texCoordIn1;                                \n"
 		"    texCoord2   = texCoordIn2;                                \n"
 		"}"
@@ -845,6 +859,7 @@ void dxRenderer::LoadPrograms()
         "#version 140                                                  \n"
 
         "uniform float offset;                                         \n"
+		"uniform mat4  matMVP;                                         \n"
 
         "in  vec4 vertPos;                                             \n"
         "in  vec2 texCoordIn;                                          \n"
@@ -852,7 +867,7 @@ void dxRenderer::LoadPrograms()
 
         "void main()                                                   \n"
         "{                                                             \n"
-        "  gl_Position = gl_ModelViewProjectionMatrix * vertPos;       \n"
+        "  gl_Position = matMVP * vertPos;                             \n"
         "  texCoord.x  = texCoordIn.x + offset;                        \n"
         "  texCoord.y  = texCoordIn.y + offset;                        \n"
         "}"
@@ -884,6 +899,7 @@ void dxRenderer::LoadPrograms()
 
     uniform_skyviewpos = GL_GetUniformLocation(program_sky, "viewPos");
     uniform_skytex     = GL_GetUniformLocation(program_sky, "skyTex");
+	uniform_skyMatMVP  = GL_GetUniformLocation(program_sky, "matMVP");
 
     float vert_skybox[24][3] = 
     {
@@ -917,8 +933,9 @@ void dxRenderer::LoadPrograms()
 
     GL_LinkProg(program_opaque);
 
-    uniform_surftex_opaque  = GL_GetUniformLocation(program_opaque, "surfTex");
-    uniform_lightmap_opaque = GL_GetUniformLocation(program_opaque, "lightMap");
+	uniform_opaqueMatMVP    = GL_GetUniformLocation(program_sky,    "matMVP");
+	uniform_surftex_opaque  = GL_GetUniformLocation(program_opaque, "surfTex");
+	uniform_lightmap_opaque = GL_GetUniformLocation(program_opaque, "lightMap");
 
     //alpha program
     GL_CreateProg(VS_ALPHA,  FS_ALPHA,  program_alpha);
@@ -928,9 +945,10 @@ void dxRenderer::LoadPrograms()
 
     GL_LinkProg(program_alpha);
 
+	uniform_alphaMatMVP    = GL_GetUniformLocation(program_alpha, "matMVP");
     uniform_surftex_alpha  = GL_GetUniformLocation(program_alpha, "surfTex");
-    uniform_alpha = GL_GetUniformLocation(program_alpha, "alpha");
-    uniform_offset = GL_GetUniformLocation(program_alpha, "offset");
+    uniform_alpha          = GL_GetUniformLocation(program_alpha, "alpha");
+    uniform_offset         = GL_GetUniformLocation(program_alpha, "offset");
 
 }
 

@@ -105,13 +105,38 @@ class dxMat3
 {
 public:
 
-    float         mat[9];
+    float                   mat[9];
 
     DX_INLINE void          Identity();
+
+	DX_INLINE operator float * ();
+	DX_INLINE operator const float * () const;
 
     DX_INLINE float &       operator [] (int i);
     DX_INLINE const float & operator [] (int i) const;
     DX_INLINE dxMat3 &      operator * (const dxMat3 &other);
+    
+};
+
+/*
+========================================
+  dxMat4
+========================================
+*/
+class dxMat4
+{
+public:
+
+    float                   mat[16];
+
+    DX_INLINE void          Identity();
+
+	DX_INLINE operator float * ();
+	DX_INLINE operator const float * () const;
+
+    DX_INLINE float &       operator [] (int i);
+    DX_INLINE const float & operator [] (int i) const;
+    DX_INLINE dxMat4 &      operator * (const dxMat4 &other);
     
 };
 

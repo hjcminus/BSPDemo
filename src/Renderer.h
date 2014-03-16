@@ -125,13 +125,15 @@ private:
     glprogram_s  program_sky, program_opaque, program_alpha;
 
     GLuint       vertbuf_sky, texcoordbuf_sky;
+	GLuint       uniform_skyMatMVP;
     GLint        uniform_skyviewpos;
     GLint        uniform_skytex;
 
-
+	GLuint       uniform_opaqueMatMVP;
     GLint        uniform_surftex_opaque;
     GLint        uniform_lightmap_opaque;
-
+	
+	GLuint       uniform_alphaMatMVP;
     GLint        uniform_surftex_alpha;
     GLint        uniform_alpha;
     GLint        uniform_offset;
@@ -151,6 +153,8 @@ private:
 
     GLuint       texture_text;
     chartexcoord_s  chartexcoords[95];
+
+	dxMat4       matMVP;
 
     void         SetColorMappings(float gamma);
     void         LoadTextTexture();
