@@ -786,7 +786,7 @@ void dxRenderer::LoadPrograms()
         "#version 140                                                  \n"
 
         "uniform vec3 viewPos;                                         \n"
-		"uniform mat4 matMVP;                                          \n"
+	"uniform mat4 matMVP;                                          \n"
 
         "in  vec4 vertPos;                                             \n"
         "in  vec2 texCoordIn;                                          \n"
@@ -859,7 +859,7 @@ void dxRenderer::LoadPrograms()
         "#version 140                                                  \n"
 
         "uniform float offset;                                         \n"
-		"uniform mat4  matMVP;                                         \n"
+	"uniform mat4  matMVP;                                         \n"
 
         "in  vec4 vertPos;                                             \n"
         "in  vec2 texCoordIn;                                          \n"
@@ -933,7 +933,7 @@ void dxRenderer::LoadPrograms()
 
     GL_LinkProg(program_opaque);
 
-	uniform_opaqueMatMVP    = GL_GetUniformLocation(program_sky,    "matMVP");
+	uniform_opaqueMatMVP    = GL_GetUniformLocation(program_opaque, "matMVP");
 	uniform_surftex_opaque  = GL_GetUniformLocation(program_opaque, "surfTex");
 	uniform_lightmap_opaque = GL_GetUniformLocation(program_opaque, "lightMap");
 
