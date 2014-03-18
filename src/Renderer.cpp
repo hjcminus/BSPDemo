@@ -69,8 +69,7 @@ void dxRenderer::Init()
     dxglAlphaFunc(GL_GREATER, 0.8f);
     dxglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    dxglEnableClientState(GL_VERTEX_ARRAY);
-    dxglEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    
 
     dxglCullFace(GL_BACK);
     dxglFrontFace(GL_CW);
@@ -619,6 +618,9 @@ bool dxRenderer::CullBox(float *mins, float *maxs)
 
 void dxRenderer::BeginDrawSky()
 {
+    dxglEnableClientState(GL_VERTEX_ARRAY);
+    dxglEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	dxglDisable(GL_CULL_FACE);
 	dxglDepthMask(GL_FALSE);
 
@@ -646,11 +648,15 @@ void dxRenderer::EndDrawSky()
 
     dxglDepthMask(GL_TRUE);
     dxglEnable(GL_CULL_FACE);
+
+    dxglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    dxglDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void dxRenderer::BeginDrawOpaque(GLuint vertbuf_model, GLuint texcoord1_model, GLuint texcoord2_model, bool alphatest)
 {
-    dxglUseProgram(program_opaque.prgnum);
+    dxglEnableClientState(GL_VERTEX_ARRAY);
+    dxglEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
     enable_alphatest = alphatest;
 
@@ -658,6 +664,8 @@ void dxRenderer::BeginDrawOpaque(GLuint vertbuf_model, GLuint texcoord1_model, G
     {
         dxglEnable(GL_ALPHA_TEST);
     }
+
+    dxglUseProgram(program_opaque.prgnum);
 
 	dxglUniformMatrix4fv(uniform_opaqueMatMVP, 1, GL_FALSE, matMVP);
     dxglUniform1i(uniform_surftex_opaque,  0);
@@ -688,10 +696,16 @@ void dxRenderer::EndDrawOpaque()
     {
         dxglDisable(GL_ALPHA_TEST);
     }
+
+    dxglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    dxglDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void dxRenderer::BeginDrawAlpha(GLuint vertbuf_model, GLuint texcoord_model)
 {
+    dxglEnableClientState(GL_VERTEX_ARRAY);
+    dxglEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
     dxglEnable(GL_BLEND);
     dxglDepthMask(GL_FALSE);
 	//dxglDisable(GL_CULL_FACE);
@@ -720,6 +734,9 @@ void dxRenderer::EndDrawAlpha()
 	//dxglEnable(GL_CULL_FACE);
     dxglDepthMask(GL_TRUE);
     dxglDisable(GL_BLEND);
+
+    dxglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    dxglDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void dxRenderer::DrawQuad(GLuint polytex, GLint offset)
@@ -786,7 +803,7 @@ void dxRenderer::LoadPrograms()
         "#version 140                                                  \n"
 
         "uniform vec3 viewPos;                                         \n"
-	"uniform mat4 matMVP;                                          \n"
+		"uniform mat4 matMVP;                                          \n"
 
         "in  vec4 vertPos;                                             \n"
         "in  vec2 texCoordIn;                                          \n"
@@ -859,7 +876,7 @@ void dxRenderer::LoadPrograms()
         "#version 140                                                  \n"
 
         "uniform float offset;                                         \n"
-	"uniform mat4  matMVP;                                         \n"
+		"uniform mat4  matMVP;                                         \n"
 
         "in  vec4 vertPos;                                             \n"
         "in  vec2 texCoordIn;                                          \n"

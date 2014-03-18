@@ -414,11 +414,17 @@ void Cfg_ReadStr(const char * section, const char * ident,
 
 void Sys_WindowCoordToSysCoord(int &x, int &y)
 {
+    POINT pt = {x, y};
+    ScreenToClient(sysvar.hMainWnd, &pt);
+
     int halfviewcx = sysvar.viewwidth  >> 1;
     int halfviewcy = sysvar.viewheight >> 1;
 
-    x -= halfviewcx;
-    y -= halfviewcy;
+    pt.x -= halfviewcx;
+    pt.y -= halfviewcy;
 
-    y = -y;
+    pt.y = -pt.y;
+
+    x = pt.x;
+    y = pt.y;
 }

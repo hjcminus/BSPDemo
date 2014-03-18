@@ -15,7 +15,8 @@
 
 LRESULT CALLBACK Sys_WindowProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
-    RECT clientrect;
+    RECT  clientrect;
+    POINT pt;
 
     switch (uiMsg)
     {
@@ -23,13 +24,19 @@ LRESULT CALLBACK Sys_WindowProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lPa
         sysvar.appactive = !(LOWORD(wParam) == WA_INACTIVE);
         break;
     case WM_LBUTTONDOWN:
-        Event_LButttonDown(LOWORD(lParam), HIWORD(lParam));
+        GetCursorPos(&pt);
+        Event_LButttonDown(pt.x, pt.y);
+        //Event_LButttonDown(LOWORD(lParam), HIWORD(lParam));
         break;
     case WM_LBUTTONUP:
-        Event_LButttonUp(LOWORD(lParam), HIWORD(lParam));
+        GetCursorPos(&pt);
+        Event_LButttonUp(pt.x, pt.y);
+        //Event_LButttonUp(LOWORD(lParam), HIWORD(lParam));
         break;
     case WM_MOUSEMOVE:
-        Event_MouseMove(LOWORD(lParam), HIWORD(lParam));
+        GetCursorPos(&pt);
+        Event_MouseMove(pt.x, pt.y);
+        //Event_MouseMove(LOWORD(lParam), HIWORD(lParam));
         break;
     case WM_KEYDOWN:
         Event_KeyDown((int)wParam);

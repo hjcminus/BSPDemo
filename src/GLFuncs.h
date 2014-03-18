@@ -24,6 +24,7 @@ extern void      (APIENTRY * dxglDeleteTextures) (GLsizei n, const GLuint *textu
 extern void      (APIENTRY * dxglDepthFunc) (GLenum func);
 extern void      (APIENTRY * dxglDepthMask) (GLboolean flag);
 extern void      (APIENTRY * dxglDisable) (GLenum cap);
+extern void      (APIENTRY * dxglDisableClientState) (GLenum array);
 extern void      (APIENTRY * dxglDrawArrays) (GLenum mode, GLint first, GLsizei count);
 extern void      (APIENTRY * dxglDrawBuffer) (GLenum mode);
 extern void      (APIENTRY * dxglEnable) (GLenum cap);
@@ -32,6 +33,7 @@ extern void      (APIENTRY * dxglEnd) (void);
 extern void      (APIENTRY * dxglFinish) (void);
 extern void      (APIENTRY * dxglFrontFace) (GLenum mode);
 extern void      (APIENTRY * dxglGenTextures) (GLsizei n, GLuint *textures);
+extern void      (APIENTRY * dxglGetIntegerv) (GLenum pname, GLint *params);
 extern GLenum    (APIENTRY * dxglGetError) (void);
 extern void      (APIENTRY * dxglGetFloatv) (GLenum pname, GLfloat *params);
 extern void      (APIENTRY * dxglLoadIdentity) (void);
@@ -115,6 +117,9 @@ extern void      (APIENTRY * dxglUniform1i) (GLint location, GLint v0);
 extern void      (APIENTRY * dxglUniformMatrix4fv) (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 extern void      (APIENTRY * dxglValidateProgram) (GLuint program);
 extern void      (APIENTRY * dxglVertexAttribPointer) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
+
+#define GL_MAJOR_VERSION                  0x821B
+#define GL_MINOR_VERSION                  0x821C
 
 //glu
 

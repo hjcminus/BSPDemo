@@ -108,14 +108,67 @@ void Event_MouseMove(int x, int y)
         int deltax = -(x - prev_x);
         int deltay =  (y - prev_y);
 
+        //static int i = 0;
+        //i++;
+
+        //Sys_Debug("[%d] y: %d, prev_y: %d, deltay: %d\n", i, y, prev_y, deltay);
+
 		prev_x = x;
 		prev_y = y;
 
-        viewer.viewangles[DX_YAW]   += deltax * 0.2f;
-        viewer.viewangles[DX_PITCH] += deltay * 0.2f;
+        //update yaw
+        viewer.viewangles[DX_YAW] += deltax * 0.2f;
+        viewer.viewangles[DX_YAW]  = AngleNormalize360(viewer.viewangles[DX_YAW]);
 
-        viewer.viewangles[DX_YAW]   = AngleNormalize360(viewer.viewangles[DX_YAW]);
+        //update pitch
+        float pitch = AngleNormalize180(viewer.viewangles[DX_PITCH]);
+
+        //Sys_Debug("[%d] pitch %f\n", i, pitch);
+
+        if (deltay > 0)
+        {
+            pitch += deltay * 0.2f;
+            if (pitch > 89)
+            {
+                //Sys_Debug("[%d] clamp to 89\n", i);
+                pitch = 89;
+            }
+        }
+        else if (deltay < 0)
+        {
+            pitch += deltay * 0.2f;
+            if (pitch < -89)
+            {
+                //Sys_Debug("[%d] clamp to -89\n", i);
+                pitch = -89;
+            }
+        }
+
+        viewer.viewangles[DX_PITCH] = AngleNormalize360(pitch);
+
+        //Sys_Debug("[%d] DX_PITCH %f\n", i, viewer.viewangles[DX_PITCH]);
+
+        /*
+
+        // -89 <= pitch <= 89
+        if (deltay < 0)
+        {
+            if (viewer.viewangles[DX_PITCH] < -89)
+            {
+                viewer.viewangles[DX_PITCH] = -89;
+            }
+        }
+        else if (deltay > 0)
+        {
+            if (viewer.viewangles[DX_PITCH] > 89)
+            {
+                viewer.viewangles[DX_PITCH] = 89;
+            }
+        }
+
         viewer.viewangles[DX_PITCH] = AngleNormalize360(viewer.viewangles[DX_PITCH]);
+
+        */
 
         viewer.anglechanged = true;
     }

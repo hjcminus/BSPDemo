@@ -22,6 +22,7 @@ void      (APIENTRY * dxglDeleteTextures) (GLsizei n, const GLuint *textures);
 void      (APIENTRY * dxglDepthFunc) (GLenum func);
 void      (APIENTRY * dxglDepthMask) (GLboolean flag);
 void      (APIENTRY * dxglDisable) (GLenum cap);
+void      (APIENTRY * dxglDisableClientState) (GLenum array);
 void      (APIENTRY * dxglDrawArrays) (GLenum mode, GLint first, GLsizei count);
 void      (APIENTRY * dxglDrawBuffer) (GLenum mode);
 void      (APIENTRY * dxglEnable) (GLenum cap);
@@ -30,6 +31,7 @@ void      (APIENTRY * dxglEnd) (void);
 void      (APIENTRY * dxglFinish) (void);
 void      (APIENTRY * dxglFrontFace) (GLenum mode);
 void      (APIENTRY * dxglGenTextures) (GLsizei n, GLuint *textures);
+void      (APIENTRY * dxglGetIntegerv) (GLenum pname, GLint *params);
 GLenum    (APIENTRY * dxglGetError) (void);
 void      (APIENTRY * dxglGetFloatv) (GLenum pname, GLfloat *params);
 void      (APIENTRY * dxglLoadIdentity) (void);
@@ -247,6 +249,7 @@ static void GL_InitGL()
     GETAPI_1_1(glDepthFunc)
     GETAPI_1_1(glDepthMask)
     GETAPI_1_1(glDisable)
+    GETAPI_1_1(glDisableClientState)
     GETAPI_1_1(glDrawArrays)
     GETAPI_1_1(glDrawBuffer)
     GETAPI_1_1(glEnable)
@@ -255,6 +258,7 @@ static void GL_InitGL()
     GETAPI_1_1(glFinish)
     GETAPI_1_1(glFrontFace)
     GETAPI_1_1(glGenTextures)
+	GETAPI_1_1(glGetIntegerv)
     GETAPI_1_1(glGetError)
     GETAPI_1_1(glGetFloatv)
     GETAPI_1_1(glLoadIdentity)
@@ -318,6 +322,16 @@ static void GL_InitGL()
     GETAPI_EXT(glUniformMatrix4fv)
     GETAPI_EXT(glValidateProgram)
     GETAPI_EXT(glVertexAttribPointer)
+
+	GLint major, minor;
+
+	dxglGetIntegerv(GL_MAJOR_VERSION, &major);
+	dxglGetIntegerv(GL_MINOR_VERSION, &minor);
+
+	if (major < 3 || (major == 3 && minor < 1))
+	{
+		Sys_Error("gl version must be equal or above to 3.1");
+	}
 }
 
 static void GL_InitGLU()
@@ -381,6 +395,7 @@ void GL_Shutdown()
     CLEARAPI(glDepthFunc)
     CLEARAPI(glDepthMask)
     CLEARAPI(glDisable)
+    CLEARAPI(glDisableClientState)
     CLEARAPI(glDrawArrays)
     CLEARAPI(glDrawBuffer)
     CLEARAPI(glEnable)
@@ -389,6 +404,7 @@ void GL_Shutdown()
     CLEARAPI(glFinish)
     CLEARAPI(glFrontFace)
     CLEARAPI(glGenTextures)
+	CLEARAPI(glGetIntegerv)
     CLEARAPI(glGetError)
     CLEARAPI(glGetFloatv)
     CLEARAPI(glLoadIdentity)

@@ -30,6 +30,16 @@ DX_INLINE float AngleNormalize360(float a)
     return a;
 }
 
+DX_INLINE float AngleNormalize180(float a)
+{
+    a = AngleNormalize360(a);
+    if (a > 180.0f)
+    {
+        a -= 360.0f;
+    }
+    return a;
+}
+
 /*
 ========================================
   dxVec3

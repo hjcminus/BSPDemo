@@ -21,6 +21,7 @@
 DX_INLINE float Inv(float f);
 DX_INLINE float DegToRad(float a);
 DX_INLINE float AngleNormalize360(float a);
+DX_INLINE float AngleNormalize180(float a);
 
 /*
 ========================================
