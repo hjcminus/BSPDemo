@@ -69,8 +69,6 @@ void dxRenderer::Init()
     dxglAlphaFunc(GL_GREATER, 0.8f);
     dxglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    
-
     dxglCullFace(GL_BACK);
     dxglFrontFace(GL_CW);
     dxglEnable(GL_CULL_FACE);
@@ -81,7 +79,6 @@ void dxRenderer::Init()
     LoadPrograms();
 
     SetColorMappings(1.5f);
-
 }
 
 void dxRenderer::Shutdown()
@@ -618,9 +615,6 @@ bool dxRenderer::CullBox(float *mins, float *maxs)
 
 void dxRenderer::BeginDrawSky()
 {
-    dxglEnableClientState(GL_VERTEX_ARRAY);
-    dxglEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
 	dxglDisable(GL_CULL_FACE);
 	dxglDepthMask(GL_FALSE);
 
@@ -648,16 +642,10 @@ void dxRenderer::EndDrawSky()
 
     dxglDepthMask(GL_TRUE);
     dxglEnable(GL_CULL_FACE);
-
-    dxglDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    dxglDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void dxRenderer::BeginDrawOpaque(GLuint vertbuf_model, GLuint texcoord1_model, GLuint texcoord2_model, bool alphatest)
 {
-    dxglEnableClientState(GL_VERTEX_ARRAY);
-    dxglEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
     enable_alphatest = alphatest;
 
     if (enable_alphatest)
@@ -696,16 +684,10 @@ void dxRenderer::EndDrawOpaque()
     {
         dxglDisable(GL_ALPHA_TEST);
     }
-
-    dxglDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    dxglDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void dxRenderer::BeginDrawAlpha(GLuint vertbuf_model, GLuint texcoord_model)
 {
-    dxglEnableClientState(GL_VERTEX_ARRAY);
-    dxglEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
     dxglEnable(GL_BLEND);
     dxglDepthMask(GL_FALSE);
 	//dxglDisable(GL_CULL_FACE);
@@ -734,9 +716,6 @@ void dxRenderer::EndDrawAlpha()
 	//dxglEnable(GL_CULL_FACE);
     dxglDepthMask(GL_TRUE);
     dxglDisable(GL_BLEND);
-
-    dxglDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    dxglDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void dxRenderer::DrawQuad(GLuint polytex, GLint offset)
