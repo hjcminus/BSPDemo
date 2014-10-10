@@ -97,7 +97,7 @@ void GL_DestroyProg(glprogram_s &prg)
             prg.vsnum = 0;
         }
 
-        dxglDeleteShader(prg.prgnum);
+        dxglDeleteProgram(prg.prgnum);
         prg.prgnum = 0;
     }
 }
