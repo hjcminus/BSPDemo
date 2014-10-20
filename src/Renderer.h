@@ -100,11 +100,15 @@ public:
     void         BeginDrawOpaque(GLuint vertbuf_model, GLuint texcoord1_model, GLuint texcoord2_model, bool alphatest);
     void         EndDrawOpaque();
 
+	void         BeginDrawOpaque2(GLuint vertbuf_model, GLuint texcoord1_model, bool alphatest);
+	void         EndDrawOpaque2();
+
     void         BeginDrawAlpha(GLuint vertbuf_model, GLuint texcoord_model);
     void         EndDrawAlpha();
 
     void         DrawQuad(GLuint polytex, GLint offset);
     void         DrawPolygonOpaque(GLuint polytex, GLuint lighttex, GLint offset, GLsizei count);
+	void         DrawPolygonOpaque2(GLuint polytex, GLint offset, GLsizei count);
     void         DrawPolygonAlpha(GLuint polytex, float alpha, float texoffset, GLint offset, GLsizei count);
 
 private:
@@ -122,7 +126,7 @@ private:
     lightmap_s   lightmaps[MAX_LIGHTMAPS];
 
     //programs
-    glprogram_s  program_sky, program_opaque, program_alpha;
+	glprogram_s  program_sky, program_opaque, program_opaque2, program_alpha;
 
     GLuint       vertbuf_sky, texcoordbuf_sky;
 	GLuint       uniform_skyMatMVP;
@@ -132,6 +136,9 @@ private:
 	GLuint       uniform_opaqueMatMVP;
     GLint        uniform_surftex_opaque;
     GLint        uniform_lightmap_opaque;
+
+	GLuint       uniform_opaque2MatMVP;
+	GLint        uniform_surftex_opaque2;
 	
 	GLuint       uniform_alphaMatMVP;
     GLint        uniform_surftex_alpha;

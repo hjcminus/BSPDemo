@@ -86,7 +86,7 @@ bool dxModel::IsLoaded() const
 	return loaded;
 }
 
-void dxModel::Load(const char * filename)
+void dxModel::Load(const char * filename, bool fullpath)
 {
     Free();
 
@@ -96,10 +96,26 @@ void dxModel::Load(const char * filename)
 
     StrPool_Clear();
 
-    DX_SAFE_FREE(mod_base);
+    DX_SAFE_FREE(mod_base); //free old map
 
     char fullfilename[MAX_PATH];
-    sprintf_s(fullfilename, MAX_PATH, "%s\\maps\\%s.bsp", sysvar.basedir, filename);
+
+	if (fullpath)
+	{
+		char temp[MAX_PATH];
+		static char dirname[MAX_PATH];
+		Str_ExtractDirName(filename, temp);
+		Str_ExtractDirName(temp, dirname);
+
+		sysvar.basedir = dirname;
+		strcpy_s(fullfilename, filename);
+	}
+	else
+	{
+		sysvar.basedir = default_basedir;
+		sprintf_s(fullfilename, MAX_PATH, "%s\\maps\\%s.bsp", sysvar.basedir, filename);
+	}
+    
 
     FILE * f = NULL;
     fopen_s(&f, fullfilename, "rb");
@@ -715,7 +731,7 @@ void dxModel::LoadTextures(lump_s *l)
         tx->height = mt->height;
         tx->gl_texturenum = 0;
 
-        if (strncmp(mt->name, "sky", 3)) //not sky
+		if (strncmp(mt->name, "sky", 3)) //not sky
         {
             tx->gl_texturenum = renderer.LoadMipTexture(mt);
         }
@@ -736,7 +752,7 @@ void dxModel::LoadTextures(lump_s *l)
             for (int j = 0; j < numtextures; j++)
             {
                 texture_s * tx = textures[j];
-                if (!tx->gl_texturenum)
+				if (tx && !tx->gl_texturenum)
                 {
                     miptex_s * mt = wad.GetLumpByName(tx->name);
                     if (mt)
@@ -996,29 +1012,34 @@ void dxModel::LoadFaces(lump_s *l)
             out->samples = lightdata + lightofs;
         }
 
+		if (!out->texinfo->texture)
+		{
+			continue;
+		}
+
         // set the drawing flags flag
-        if (!strncmp(out->texinfo->texture->name, "sky", 3))
+		if (!strncmp(out->texinfo->texture->name, "sky", 3))
         {
             out->flags |= (SURF_DRAWSKY | SURF_DRAWTILED);
 
             goto SET_VERT_BUF;
         }
 
-        if (!strncmp(out->texinfo->texture->name, "black", 5))
+		if (!strncmp(out->texinfo->texture->name, "black", 5))
         {
             out->flags = SURF_NODRAW;
 
             goto SET_VERT_BUF;
         }
 
-        if (!strncmp(out->texinfo->texture->name, "hint", 4))
+		if (!strncmp(out->texinfo->texture->name, "hint", 4))
         {
             out->flags = SURF_NODRAW;
 
             goto SET_VERT_BUF;
         }
 
-        if (!strncmp(out->texinfo->texture->name,"*",1))		// turbulent
+		if (!strncmp(out->texinfo->texture->name, "*", 1))		// turbulent
         {
             out->flags |= (SURF_DRAWTURB | SURF_DRAWTILED);
             for (int k = 0; k < 2; k++)
@@ -1788,21 +1809,40 @@ void dxModel::DrawSkyBox()
 
 void dxModel::DrawOpaqueSurface(bool alphatest)
 {
+	msurface_s * s = NULL;
+
     renderer.BeginDrawOpaque(vertbuf_model, texcoord1_model, texcoord2_model, alphatest);
 
-    msurface_s * s = r_opaque;
+    s = r_opaque;
     for (; s; s = s->texturechain)
     {
-        if (!s->lightmap)
+		if (s->lightmap && s->texinfo->texture)
         {
-            continue;
+			renderer.DrawPolygonOpaque(s->texinfo->texture->gl_texturenum, s->lightmap->texnum,
+				s->vet_offset, s->numverts);
         }
-
-        renderer.DrawPolygonOpaque(s->texinfo->texture->gl_texturenum, s->lightmap->texnum,
-            s->vet_offset, s->numverts);
     }
 
     renderer.EndDrawOpaque();
+
+	renderer.BeginDrawOpaque2(vertbuf_model, texcoord1_model, alphatest);
+
+	s = r_opaque;
+	for (; s; s = s->texturechain)
+	{
+		if (s->flags & (SURF_DRAWSKY | SURF_DRAWTURB | SURF_NODRAW))
+		{
+			continue;
+		}
+
+		if (!s->lightmap && s->texinfo->texture)
+		{
+			renderer.DrawPolygonOpaque2(s->texinfo->texture->gl_texturenum,
+				s->vet_offset, s->numverts);
+		}
+	}
+
+	renderer.EndDrawOpaque2();
 }
 
 void dxModel::DrawAlphaSurface()

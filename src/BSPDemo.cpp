@@ -91,6 +91,8 @@ void Sys_GetOpenFileName(char * filename)
     }
 }
 
+char default_basedir[MAX_PATH];
+
 void Sys_LoadConfig()
 {
     char exefilename[MAX_PATH];
@@ -100,10 +102,10 @@ void Sys_LoadConfig()
     Str_ExtractDirName(exefilename, exedirname);
 
     //init basedir
-	sprintf_s(sysvar.basedir, MAX_PATH, "%s\\..\\..\\..\\res", exedirname);
+	sprintf_s(default_basedir, MAX_PATH, "%s\\..\\..\\..\\res", exedirname);
 
 	char inifilename[MAX_PATH];
-	sprintf_s(inifilename, MAX_PATH, "%s\\demo.ini", sysvar.basedir);
+	sprintf_s(inifilename, MAX_PATH, "%s\\demo.ini", default_basedir);
 
     //init map item
     char value[1024];

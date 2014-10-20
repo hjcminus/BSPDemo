@@ -119,6 +119,19 @@ public:
 
 /*
 ========================================
+  dxButtonSel
+========================================
+*/
+class dxButtonSel : public dxButton
+{
+public:
+
+	virtual void  OnClick(int x, int y);
+};
+
+
+/*
+========================================
   dxImage
 ========================================
 */
@@ -217,11 +230,12 @@ private:
     dxLabel       lbl_title;
     dxButtonOk    btn_ok;
     dxButtonQuit  btn_quit;
+	dxButtonSel   btn_sel;
     dxStaticListBox lst_map;
     dxImage       img_map;
 
     dxWidget *    prev_focused;
-    dxWidget *    controls[5];
+    dxWidget *    controls[6];
 
     int           mouse_down_x;
     int           mouse_down_y;

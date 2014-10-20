@@ -7,6 +7,8 @@
 #include "Precompiled.h"
 #pragma hdrstop
 
+#include <commdlg.h>
+
 const dxVec4 FILL_COLOR_FOCUS  = {0,0.9f,0,0.5f};
 const dxVec4 FILL_COLOR_NORMAL = {0,0.5f,0,0.5f};
 const dxVec4 FRAME_COLOR = {0,0.5f,0,1.0f};
@@ -183,7 +185,7 @@ void dxButtonOk::OnClick(int x, int y)
         const char * mapname = lstmap->GetSelected();
         if (mapname)
         {
-            worldModel.Load(mapname);
+            worldModel.Load(mapname, false);
         }
     }
 }
@@ -196,6 +198,37 @@ void dxButtonOk::OnClick(int x, int y)
 void dxButtonQuit::OnClick(int x, int y)
 {
     PostQuitMessage(0);
+}
+
+/*
+========================================
+  dxButtonSel
+========================================
+*/
+void dxButtonSel::OnClick(int x, int y)
+{
+	OPENFILENAMEA ofn;
+
+	char mapname[MAX_PATH];
+	mapname[0] = 0;
+
+	memset(&ofn, 0, sizeof(ofn));
+
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFile = mapname;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrFilter = "BSP Files (*.bsp)\0*.bsp\0\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = " ";
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileNameA(&ofn))
+	{
+		worldModel.Load(mapname, true);
+	}
 }
 
 /*
@@ -235,7 +268,7 @@ void dxImage::LoadImage(const char * filename)
 	strcpy_s(oldfilename, MAX_PATH, filename);
 
 	char fullfilename[MAX_PATH];
-	sprintf_s(fullfilename, MAX_PATH, "%s\\maps\\%s.bmp", sysvar.basedir, oldfilename);
+	sprintf_s(fullfilename, MAX_PATH, "%s\\maps\\%s.bmp", default_basedir, oldfilename);
 	image = renderer.LoadTempBMPTexture(fullfilename);
 }
 
@@ -375,8 +408,9 @@ dxMenu::dxMenu()
     controls[0] = &lbl_title;
     controls[1] = &btn_ok;
     controls[2] = &btn_quit;
-    controls[3] = &img_map;
-    controls[4] = &lst_map;
+	controls[3] = &btn_sel;
+    controls[4] = &img_map;
+    controls[5] = &lst_map;
 
     InitControls();
 }
@@ -419,7 +453,7 @@ void dxMenu::Draw()
 
     renderer.FillRect(FILL_COLOR_NORMAL, menu_left, menu_bottom, menu_right, menu_top);
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 6; i++)
     {
         controls[i]->Draw();
     }
@@ -445,7 +479,7 @@ void dxMenu::OnLButtonDown(int x, int y)
 
 void dxMenu::OnLButtonUp(int x, int y)
 {
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 6; i++)
     {
         if (controls[i]->PointIn(mouse_down_x, mouse_down_y)
         &&  controls[i]->PointIn(x, y))
@@ -463,7 +497,7 @@ void dxMenu::OnMouseMove(int x, int y)
         prev_focused->SetFocus(false);
     }
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 6; i++)
     {
         if (controls[i]->PointIn(x, y))
         {
@@ -516,6 +550,9 @@ void dxMenu::InitControls()
 
     btn_quit.SetPos(lf, bt, rt, tp);
     btn_quit.SetCaption("Quit");
+
+	btn_sel.SetPos(menu_left + BTN_SPAN, bt, menu_left + BTN_CX + 25, bt + BTN_CY);
+	btn_sel.SetCaption("Select");
 
     lf = menu_left + BTN_SPAN;
     rt = lf + IMAGE_WIDTH;

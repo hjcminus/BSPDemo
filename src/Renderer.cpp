@@ -686,6 +686,42 @@ void dxRenderer::EndDrawOpaque()
     }
 }
 
+void dxRenderer::BeginDrawOpaque2(GLuint vertbuf_model, GLuint texcoord1_model, bool alphatest)
+{
+	enable_alphatest = alphatest;
+
+	if (enable_alphatest)
+	{
+		dxglEnable(GL_ALPHA_TEST);
+	}
+
+	dxglUseProgram(program_opaque2.prgnum);
+
+	dxglUniformMatrix4fv(uniform_opaque2MatMVP, 1, GL_FALSE, matMVP);
+	dxglUniform1i(uniform_surftex_opaque2, 0);
+
+	dxglEnableVertexAttribArray(0);
+	dxglBindBuffer(GL_ARRAY_BUFFER, vertbuf_model);
+	dxglVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
+
+	dxglEnableVertexAttribArray(1);
+	dxglBindBuffer(GL_ARRAY_BUFFER, texcoord1_model);
+	dxglVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
+}
+
+void dxRenderer::EndDrawOpaque2()
+{
+	dxglDisableVertexAttribArray(1);
+	dxglDisableVertexAttribArray(0);
+
+	dxglUseProgram(0);
+
+	if (enable_alphatest)
+	{
+		dxglDisable(GL_ALPHA_TEST);
+	}
+}
+
 void dxRenderer::BeginDrawAlpha(GLuint vertbuf_model, GLuint texcoord_model)
 {
     dxglEnable(GL_BLEND);
@@ -732,6 +768,13 @@ void dxRenderer::DrawPolygonOpaque(GLuint polytex, GLuint lighttex, GLint offset
     dxglActiveTexture(GL_TEXTURE1);
     GL_BindTexture(lighttex);
     dxglDrawArrays(GL_POLYGON, offset, count);
+}
+
+void dxRenderer::DrawPolygonOpaque2(GLuint polytex, GLint offset, GLsizei count)
+{
+	dxglActiveTexture(GL_TEXTURE0);
+	GL_BindTexture(polytex);
+	dxglDrawArrays(GL_POLYGON, offset, count);
 }
 
 void dxRenderer::DrawPolygonAlpha(GLuint polytex, float alpha, float texoffset, GLint offset, GLsizei count)
@@ -849,6 +892,39 @@ void dxRenderer::LoadPrograms()
         "}"
     };
 
+	//opaque shader
+	static const char * VS_OPAQUE2[] =
+	{
+		"#version 140                                                  \n"
+
+		"uniform mat4 matMVP;                                          \n"
+
+		"in  vec4 vertPos;                                             \n"
+		"in  vec2 texCoordIn1;                                         \n"
+		"out vec2 texCoord1;                                           \n"
+
+		"void main()                                                   \n"
+		"{                                                             \n"
+		"    gl_Position = matMVP * vertPos;                           \n"
+		"    texCoord1   = texCoordIn1;                                \n"
+		"}"
+	};
+
+	static const char * FS_OPAQUE2[] =
+	{
+		"#version 140                                                  \n"
+
+		"uniform sampler2D surfTex;                                    \n"
+
+		"in vec2 texCoord1;                                            \n"
+
+		"void main()                                                   \n"
+		"{                                                             \n"
+		"    vec4 fragColor0 = texture(surfTex,  texCoord1);           \n"
+		"    gl_FragColor = fragColor0;                                \n"
+		"}"
+	};
+
     //alpha shader
     static const char * VS_ALPHA [] =
     {
@@ -932,6 +1008,17 @@ void dxRenderer::LoadPrograms()
 	uniform_opaqueMatMVP    = GL_GetUniformLocation(program_opaque, "matMVP");
 	uniform_surftex_opaque  = GL_GetUniformLocation(program_opaque, "surfTex");
 	uniform_lightmap_opaque = GL_GetUniformLocation(program_opaque, "lightMap");
+
+	GL_CreateProg(VS_OPAQUE2, FS_OPAQUE2, program_opaque2);
+
+	GL_BindAttribLocation(program_opaque2, 0, "vertPos");
+	GL_BindAttribLocation(program_opaque2, 1, "texCoordIn1");
+
+	GL_LinkProg(program_opaque2);
+
+	uniform_opaque2MatMVP = GL_GetUniformLocation(program_opaque2, "matMVP");
+	uniform_surftex_opaque2 = GL_GetUniformLocation(program_opaque2, "surfTex");
+
 
     //alpha program
     GL_CreateProg(VS_ALPHA,  FS_ALPHA,  program_alpha);

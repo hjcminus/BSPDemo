@@ -115,8 +115,10 @@ struct sysvar_s
     int        viewheight;
 	int        ctrx;
 	int        ctry;
-	char       basedir[MAX_PATH];
+	char *     basedir;
 };
+
+extern char     default_basedir[MAX_PATH];
 
 extern sysvar_s sysvar;
 

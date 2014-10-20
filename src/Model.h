@@ -132,7 +132,7 @@ public:
     dxModel();
     ~dxModel();
 
-    void               Load(const char * filename);
+    void               Load(const char * filename, bool fullpath);
     void               Free();
 
     void               DrawLoading();
