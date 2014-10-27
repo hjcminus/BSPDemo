@@ -1039,6 +1039,13 @@ void dxModel::LoadFaces(lump_s *l)
             goto SET_VERT_BUF;
         }
 
+		if (!strncmp(out->texinfo->texture->name, "aaatrigger", 10))
+		{
+			out->flags = SURF_NODRAW;
+
+			goto SET_VERT_BUF;
+		}
+
 		if (!strncmp(out->texinfo->texture->name, "*", 1))		// turbulent
         {
             out->flags |= (SURF_DRAWTURB | SURF_DRAWTILED);
@@ -1468,7 +1475,7 @@ void dxModel::CalcSurfaceExtents(msurface_s *s)
 
 void dxModel::CreateSurfaceLightmap(msurface_s *surf)
 {
-    if (surf->flags & (SURF_DRAWSKY | SURF_DRAWTURB))
+    if (surf->flags & (SURF_DRAWSKY | SURF_DRAWTURB | SURF_NODRAW))
     {
         return;
     }
