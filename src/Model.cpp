@@ -102,16 +102,22 @@ void dxModel::Load(const char * filename, bool fullpath)
 
 	if (fullpath)
 	{
-		char temp[MAX_PATH];
+		static char temp[MAX_PATH];
 		static char dirname[MAX_PATH];
 		Str_ExtractDirName(filename, temp);
 		Str_ExtractDirName(temp, dirname);
 
+		Str_ExtractDirName(dirname, temp);
+
+		strcat_s(temp, "\\valve");
+
 		sysvar.basedir = dirname;
+		sysvar.basedir_valve = temp;
 		strcpy_s(fullfilename, filename);
 	}
 	else
 	{
+		sysvar.basedir = default_basedir;
 		sysvar.basedir = default_basedir;
 		sprintf_s(fullfilename, MAX_PATH, "%s\\maps\\%s.bsp", sysvar.basedir, filename);
 	}
@@ -461,6 +467,8 @@ void dxModel::LoadEntities(lump_s *l)
         }
     }
 
+	skyname[0] = 0;
+
     //init entity
     for (int i = 0; i < numentities; i++)
     {
@@ -764,6 +772,29 @@ void dxModel::LoadTextures(lump_s *l)
 
             wad.Free();
         }
+		else //try another place
+		{
+			sprintf_s(filename, "%s\\%s", sysvar.basedir_valve, wadfiles[i]);
+
+			if (wad.Load(filename))
+			{
+				for (int j = 0; j < numtextures; j++)
+				{
+					texture_s * tx = textures[j];
+					if (tx && !tx->gl_texturenum)
+					{
+						miptex_s * mt = wad.GetLumpByName(tx->name);
+						if (mt)
+						{
+							tx->gl_texturenum = renderer.LoadMipTexture(mt);
+						}
+					}
+				}
+
+				wad.Free();
+			}
+
+		}
     }
 }
 

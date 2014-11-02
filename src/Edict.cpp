@@ -214,11 +214,10 @@ void ED_ParseRenderfx(epair_s *p, int &renderfx)
 void ED_ParseSkyName(epair_s *p, char *value)
 {
     char * v = ED_ValueForKey(p, "skyname");
-    if (!v)
-    {
-        Sys_Error("no skyname");
-    }
-    strcpy_s(value, DX_ID_LEN, v);
+	if (v)
+	{
+		strcpy_s(value, DX_ID_LEN, v);
+	}
 }
 
 void ED_ParseHostageEntity(dxEntity * e)

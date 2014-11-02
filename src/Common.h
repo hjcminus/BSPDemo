@@ -116,10 +116,10 @@ struct sysvar_s
 	int        ctrx;
 	int        ctry;
 	char *     basedir;
+	char *     basedir_valve;
 };
 
 extern char     default_basedir[MAX_PATH];
-
 extern sysvar_s sysvar;
 
 void FS_Change(FrameState fs);
