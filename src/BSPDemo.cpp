@@ -93,6 +93,17 @@ void Sys_GetOpenFileName(char * filename)
 
 char default_basedir[MAX_PATH];
 
+bool Sys_FolderExists(const char* folder) {
+    DWORD code = GetFileAttributesA(folder);
+    if (code != INVALID_FILE_ATTRIBUTES) {
+        return code != 0;
+    }
+    else {
+        DWORD err = GetLastError();
+        return err != ERROR_FILE_NOT_FOUND && err != ERROR_PATH_NOT_FOUND && err != ERROR_INVALID_NAME && err != ERROR_BAD_NETPATH;
+    }
+}
+
 void Sys_LoadConfig()
 {
     char exefilename[MAX_PATH];
@@ -103,6 +114,9 @@ void Sys_LoadConfig()
 
     //init basedir
 	sprintf_s(default_basedir, MAX_PATH, "%s\\..\\..\\..\\res", exedirname);
+    if (!Sys_FolderExists(default_basedir)) {
+        sprintf_s(default_basedir, MAX_PATH, "%s\\..\\..\\res", exedirname);
+    }
 
 	char inifilename[MAX_PATH];
 	sprintf_s(inifilename, MAX_PATH, "%s\\demo.ini", default_basedir);
